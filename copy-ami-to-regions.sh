@@ -4,7 +4,7 @@ source="us-east-1"
 ami_name="test-ami-name"
 source_ami_id="ami-xxxxxxxxxxxxx"
 
-for i in `cat /Users/vrudraiah/Documents/scripts/destination-regions.txt` ;
+for i in `cat /Users/user1/Documents/scripts/destination-regions.txt` ;
 
 do
 
