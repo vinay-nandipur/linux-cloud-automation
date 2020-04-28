@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# edit visudo (sudo visudo -> <USERNAME> ALL=(ALL) NOPASSWD:ALL) to run sudo commands without password -> make sure to exit terminal & re-login for changes to take effect.
+# edit visudo (sudo visudo -> <USERNAME> ALL=(ALL) NOPASSWD:ALL) to run sudo commands without password 
+# sudo nano /etc/sudoers.d/<USERNAME> ->  <USERNAME> ALL=(ALL) NOPASSWD:ALL
+#make sure to exit terminal & re-login for changes to take effect.
 
 #remove docker old installs
 sudo yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine             
