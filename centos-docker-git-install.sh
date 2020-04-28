@@ -2,9 +2,6 @@
 
 # edit visudo (sudo visudo -> <USERNAME> ALL=(ALL) NOPASSWD:ALL) to run sudo commands without password.
 
-#update yum repos
-sudo yum update -y
-
 #remove docker old installs
 sudo yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine             
 
