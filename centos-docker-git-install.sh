@@ -28,7 +28,7 @@ sudo yum remove git -y
 
 #install git from source
 sudo wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.2.tar.gz -O /usr/src/git-2.26.2.tar.gz
-cd /usr/src/git-2.26.2 && sudo tar xzf /usr/src/git-2.26.2.tar.gz
+cd /usr/src/ && sudo tar xzf /usr/src/git-2.26.2.tar.gz
 cd /usr/src/git-2.26.2 && sudo make prefix=/usr/local/git all ; cd /usr/src/git-2.26.2 && sudo make prefix=/usr/local/git install
 echo "export PATH=$PATH:/usr/local/git/bin/" >> ~/.bashrc
 source ~/.bashrc
