@@ -17,6 +17,8 @@ sudo yum install yum-utils device-mapper-persistent-data lvm2 curl-devel expat-d
 sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
 
 #update yum repos
+sudo yum clean all
+sudo yum makecache
 sudo yum update -y
 
 #install, configure, enable & start docker-ce
