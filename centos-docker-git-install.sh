@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# edit visudo (sudo visudo -> <USERNAME> ALL=(ALL) NOPASSWD:ALL) to run sudo commands without password.
+
 #update yum repos
 sudo yum update -y
 
