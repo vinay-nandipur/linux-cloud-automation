@@ -98,23 +98,10 @@ sudo cp terraform /usr/bin/terraform
 
 #Install NodeJS - pre-requisite for Cloud9
 
-sudo mkdir -p $HOME/src/local/lib/nodejs
-cd $HOME/src && curl -O https://nodejs.org/dist/v12.16.3/node-v12.16.3-linux-x64.tar.xz
-cd $HOME/src && sudo tar -xJf node-v12.16.3-linux-x64.tar.xz -C $HOME/src/local/lib/nodejs
-export NODEJS_VERSION=v12.16.3
-export DISTRO=linux-x64
-sudo chmod +x $HOME/src/local/lib/nodejs/node-$NODEJS_VERSION-$DISTRO/bin/node
+curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
+source ~/.bashrc
+nvm install node
 
-cat >> nodejs_export.txt <<EOL
-# Nodejs
-export NODEJS_VERSION=v12.16.3
-export DISTRO=linux-x64
-PATH=$HOME/src/local/lib/nodejs/node-$NODEJS_VERSION-$DISTRO/bin:$PATH
-export PATH
-EOL
-
-cat nodejs_export.txt >> ~/.bash_profile
-source ~/.bash_profile
 
 echo "$(tput setaf 7)###############Installed Development Tools Details:################# $(tput sgr 0)"
 echo "$(tput setaf 2)`git --version`$(tput sgr 0)"
