@@ -57,6 +57,8 @@ sudo yum module -y install go-toolset
 #Install pyenv
 git clone https://github.com/pyenv/pyenv.git ~/.pyenv && echo "cloned"
 
+sleep 23
+
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
 
 echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
@@ -87,6 +89,7 @@ sudo python3 -m pip install ansible boto boto3 tox pypsrp pywinrm requests-creds
 #Install latest version of Packer
 sudo mkdir -p $HOME/src/github.com/hashicorp && cd $_
 sudo git clone https://github.com/hashicorp/packer.git && echo "cloned"
+sleep 23
 cd $HOME/src/github.com/hashicorp/packer && sudo make dev
 sudo chmod +x $HOME/src/github.com/hashicorp/packer/bin/packer
 sudo ln -s $HOME/src/github.com/hashicorp/packer/bin/packer /usr/bin/packer
@@ -100,6 +103,7 @@ sudo cp terraform /usr/bin/terraform
 #Install NodeJS - pre-requisite for Cloud9
 cd $HOME/src
 sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash && echo "nvm installed"
+sleep 23
 cat >> nodejs_export.txt <<EOL
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 EOL
