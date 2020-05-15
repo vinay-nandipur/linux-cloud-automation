@@ -33,11 +33,8 @@ sudo yum remove -y docker docker-client docker-client-latest docker-common docke
 sudo yum install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm -y
 sudo yum -y install docker-ce docker-ce-cli
 sudo systemctl start docker && sudo systemctl enable docker
-sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
-sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
-sudo chmod g+rwx "$HOME/.docker" -R
 
 #install docker-compose
 sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -58,7 +55,7 @@ source ~/.bash_profile
 sudo yum module -y install go-toolset
 
 #Install pyenv
-git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv && echo "cloned"
 
 echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
 
@@ -89,7 +86,7 @@ sudo python3 -m pip install ansible boto boto3 tox pypsrp pywinrm requests-creds
 
 #Install latest version of Packer
 sudo mkdir -p $HOME/src/github.com/hashicorp && cd $_
-sudo git clone https://github.com/hashicorp/packer.git
+sudo git clone https://github.com/hashicorp/packer.git && echo "cloned"
 cd $HOME/src/github.com/hashicorp/packer && sudo make dev
 sudo chmod +x $HOME/src/github.com/hashicorp/packer/bin/packer
 sudo ln -s $HOME/src/github.com/hashicorp/packer/bin/packer /usr/bin/packer
@@ -102,7 +99,7 @@ sudo cp terraform /usr/bin/terraform
 
 #Install NodeJS - pre-requisite for Cloud9
 cd $HOME/src
-sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash && echo "nvm installed"
 cat >> nodejs_export.txt <<EOL
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 EOL
