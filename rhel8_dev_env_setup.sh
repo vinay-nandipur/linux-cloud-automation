@@ -97,9 +97,13 @@ sudo unzip terraform_0.12.25_linux_amd64.zip
 sudo cp terraform /usr/bin/terraform
 
 #Install NodeJS - pre-requisite for Cloud9
-
-curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.0/install.sh | bash
-source ~/.bashrc
+cd $HOME/src
+sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+cat >> nodejs_export.txt <<EOL
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+EOL
+cat nodejs_export.txt >> ~/.bash_profile
+source ~/.bash_profile
 nvm install node
 
 
