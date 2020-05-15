@@ -19,14 +19,14 @@ yum -y install gcc python3 python3-devel jq wget tar git vim nano curl less libf
 yum erase git -y
 
 #install git from source
-mkdir -p $HOME/src/git-2.26.2
-wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.2.tar.gz -O $HOME/src/git-2.26.2.tar.gz
-cd $HOME/src/ && tar xzf $HOME/src/git-2.26.2.tar.gz --strip 1 -C $HOME/src/git-2.26.2
-cd $HOME/src/git-2.26.2 && make prefix=/usr/local/git all ; cd $HOME/src/git-2.26.2 && make prefix=/usr/local/git install
+mkdir -p /usr/src/git-2.26.2
+wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.2.tar.gz -O /usr/src/git-2.26.2.tar.gz
+cd /usr/src/ && tar xzf /usr/src/git-2.26.2.tar.gz --strip 1 -C /usr/src/git-2.26.2
+cd /usr/src/git-2.26.2 && make prefix=/usr/local/git all ; cd /usr/src/git-2.26.2 && make prefix=/usr/local/git install
 rm -rf /usr/bin/git
 ln -s /usr/local/git/bin/git /usr/bin/git
-echo "export PATH=$PATH:/usr/local/git/bin/" >> ~/.bash_profile
-source ~/.bash_profile
+echo "export PATH=$PATH:/usr/local/git/bin/" >> /etc/profile
+source /etc/profile
 
 #install, configure, enable & start docker-ce
 yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
@@ -42,79 +42,78 @@ curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compo
 chmod +x /usr/local/bin/docker-compose
 
 #Install & Configure ChefDK
-cd $HOME/src
+cd /usr/src
 wget https://packages.chef.io/files/stable/chefdk/4.7.73/el/8/chefdk-4.7.73-1.el7.x86_64.rpm
 
-rpm -Uvh $HOME/src/chefdk-4.7.73-1.el7.x86_64.rpm
+rpm -Uvh /usr/src/chefdk-4.7.73-1.el7.x86_64.rpm
 
-echo 'eval "$(chef shell-init bash)"' >> ~/.bash_profile
+echo 'eval "$(chef shell-init bash)"' >> /etc/profile
 
-echo 'export PATH="/opt/chefdk/embedded/bin:$PATH"' >> ~/.bash_profile
-source ~/.bash_profile
+echo 'export PATH="/opt/chefdk/embedded/bin:$PATH"' >> /etc/profile
+source /etc/profile
 
 #Install Go
 yum module -y install go-toolset
 
+
 #Install pyenv
-git clone https://github.com/pyenv/pyenv.git $HOME/.pyenv
+git clone https://github.com/pyenv/pyenv.git /usr/src/.pyenv
 
-pid=$!
-wait $pid
+sleep 5
 
-echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bash_profile
+echo 'export PYENV_ROOT="/usr/src/.pyenv"' >> /etc/profile
 
-echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bash_profile
+echo 'export PATH="/usr/src/.pyenv/bin:$PATH"' >> /etc/profile
 
-echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> /etc/profile
 
-source ~/.bash_profile
+source /etc/profile
 
 #Install latest python3
-$HOME/.pyenv/bin/pyenv install 3.8.2
+/usr/src/.pyenv/bin/pyenv install 3.8.3
 
-$HOME/.pyenv/bin/pyenv global 3.8.2
+/usr/src/.pyenv/bin/pyenv global 3.8.3
 
-$HOME/.pyenv/bin/pyenv shell 3.8.2
+/usr/src/.pyenv/bin/pyenv shell 3.8.3
 
 
 #Install required Python packages
 
-python3 -m pip install --upgrade pip
+pip install --upgrade pip
 
-python3 -m pip install wheel
+pip install wheel
 
-python3 -m pip install ansible boto boto3 tox pypsrp pywinrm requests-credssp requests-ntlm awscli
+pip install ansible boto boto3 tox pypsrp pywinrm requests-credssp requests-ntlm awscli
 
 #Install latest version of Packer
-mkdir -p $HOME/src/github.com/hashicorp && cd $_
-git clone https://github.com/hashicorp/packer.git
-pid=$!
-wait $pid
-cd $HOME/src/github.com/hashicorp/packer && make dev
-chmod +x $HOME/src/github.com/hashicorp/packer/bin/packer
-ln -s $HOME/src/github.com/hashicorp/packer/bin/packer /usr/bin/packer
+rm -f /usr/sbin/packer
+export PACKER_URL="https://releases.hashicorp.com/packer/1.5.6/packer_1.5.6_linux_amd64.zip"
+
+export PACKER_SHA256="2abb95dc3a5fcfb9bf10ced8e0dd51d2a9e6582a1de1cab8ccec650101c1f9df"
+
+curl -fsSL "$PACKER_URL" -o /packer.zip \
+  && echo "$PACKER_SHA256 /packer.zip" | sha256sum -c - \
+  && gunzip -c -S zip /packer.zip >/usr/local/bin/packer \
+  && chmod 755 /usr/local/bin/packer \
+  && rm -f /packer.zip
+
+echo 'export PATH=/usr/local/bin/:$PATH' >> /etc/profile
+source /etc/profile
 
 #Install latest version of Terraform
-cd $HOME/src
+cd /usr/src
 curl -O https://releases.hashicorp.com/terraform/0.12.25/terraform_0.12.25_linux_amd64.zip
 unzip terraform_0.12.25_linux_amd64.zip
 cp terraform /usr/bin/terraform
 
 #Install NodeJS - pre-requisite for Cloud9
-cd $HOME/src
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-pid=$!
-wait $pid
-cat >> nodejs_export.txt <<EOL
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-EOL
+mkdir -p /usr/src/local/lib/nodejs
+cd /usr/src && curl -O https://nodejs.org/dist/v12.16.3/node-v12.16.3-linux-x64.tar.xz
+cd /usr/src && tar -xJf node-v12.16.3-linux-x64.tar.xz -C /usr/src/local/lib/nodejs --strip 1
+chmod +x /usr/src/local/lib/nodejs/bin/node
+echo 'export PATH=/usr/src/local/lib/nodejs/bin/:$PATH' >> /etc/profile
+source /etc/profile
 
-
-cat nodejs_export.txt >> ~/.bash_profile
-source ~/.bash_profile
-nvm install node
 
 echo "$(tput setaf 7)###############Installed Development Tools Details:################# $(tput sgr 0)"
 echo "$(tput setaf 2)`git --version`$(tput sgr 0)"
