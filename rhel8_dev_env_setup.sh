@@ -33,7 +33,11 @@ sudo yum remove -y docker docker-client docker-client-latest docker-common docke
 sudo yum install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm -y
 sudo yum -y install docker-ce docker-ce-cli
 sudo systemctl start docker && sudo systemctl enable docker
+sudo groupadd docker
 sudo usermod -aG docker $USER
+newgrp docker
+sudo chown "$USER":"$USER" /home/"$USER"/.docker -R
+sudo chmod g+rwx "$HOME/.docker" -R
 
 #install docker-compose
 sudo curl -L "https://github.com/docker/compose/releases/download/1.25.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
@@ -104,7 +108,7 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || pr
 EOL
 cat nodejs_export.txt >> ~/.bash_profile
 source ~/.bash_profile
-nvm install node
+sudo nvm install node
 
 
 echo "$(tput setaf 7)###############Installed Development Tools Details:################# $(tput sgr 0)"
