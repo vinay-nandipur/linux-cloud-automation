@@ -1,2 +1,2 @@
 # linux-cloud-automation
-Collection of Linux/Cloud Automation scripts.
+This repo has collection of Linux/Cloud Automation scripts.
