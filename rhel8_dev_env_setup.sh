@@ -21,7 +21,7 @@ sudo yum erase git -y
 #install git from source
 sudo mkdir -p $HOME/src/git-2.26.2
 sudo wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.26.2.tar.gz -O $HOME/src/git-2.26.2.tar.gz
-sudo cd $HOME/src/ && sudo tar xzf /usr/src/git-2.26.2.tar.gz --strip 1 -C $HOME/src/git-2.26.2
+sudo cd $HOME/src/ && sudo tar xzf $HOME/src/git-2.26.2.tar.gz --strip 1 -C $HOME/src/git-2.26.2
 sudo cd $HOME/src/git-2.26.2 && sudo make prefix=/usr/local/git all ; cd $HOME/src/git-2.26.2 && sudo make prefix=/usr/local/git install
 sudo rm -rf /usr/bin/git
 sudo ln -s /usr/local/git/bin/git /usr/bin/git
