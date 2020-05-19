@@ -72,10 +72,11 @@ source /etc/profile
 #Install latest python3
 /usr/src/.pyenv/bin/pyenv install 3.8.3
 
-/usr/src/.pyenv/bin/pyenv global 3.8.3
+/usr/src/.pyenv/bin/pyenv install 2.7.18
 
-/usr/src/.pyenv/bin/pyenv shell 3.8.3
+pyenv init
 
+pyenv shell 2.7.18 3.8.3
 
 #Install required Python packages
 
