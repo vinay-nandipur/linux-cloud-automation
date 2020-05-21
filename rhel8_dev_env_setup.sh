@@ -90,12 +90,13 @@ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nf
 
 source ~/.bash_profile
 
-#Install latest python3
-/usr/src/.pyenv/bin/pyenv install 3.8.3
+#Install latest python2
 
 /usr/src/.pyenv/bin/pyenv install 2.7.18
 
 pyenv init
+
+pyenv global 2.7.18 3.8.3
 
 pyenv shell 2.7.18 3.8.3
 
@@ -106,6 +107,31 @@ pip install --upgrade pip
 pip install wheel
 
 pip install ansible boto boto3 tox pypsrp pywinrm requests-credssp requests-ntlm awscli aws-cfn-bootstrap
+
+#Install latest python3
+
+/usr/src/.pyenv/bin/pyenv install 3.8.3
+
+pyenv init
+
+pyenv global 3.8.3 2.7.18
+
+pyenv shell 3.8.3 2.7.18
+
+#Install required Python packages
+
+pip install --upgrade pip
+
+pip install wheel
+
+pip install ansible boto boto3 tox pypsrp pywinrm requests-credssp requests-ntlm awscli
+
+# setting default python version to 2 as aws-cfn-bootstrap not yet compatible with python 3
+#https://forums.aws.amazon.com/thread.jspa?threadID=313496
+
+pyenv global 2.7.18 3.8.3
+
+pyenv shell 2.7.18 3.8.3
 
 #Install latest version of Packer
 rm -f /usr/sbin/packer
