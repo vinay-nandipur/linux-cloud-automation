@@ -96,9 +96,9 @@ source ~/.bash_profile
 
 pyenv init
 
-pyenv global 2.7.18 3.8.3
+pyenv global 2.7.18
 
-pyenv shell 2.7.18 3.8.3
+pyenv shell 2.7.18
 
 #Install required Python packages
 
