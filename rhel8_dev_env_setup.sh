@@ -27,11 +27,19 @@ rm -rf /usr/bin/git
 ln -s /usr/local/git/bin/git /usr/bin/git
 echo "export PATH=$PATH:/usr/local/git/bin/" >> /etc/profile
 source /etc/profile
+echo "export PATH=$PATH:/usr/local/git/bin/" >> ~/.bash_profile
+source ~/.bash_profile
 
 #install, configure, enable & start docker-ce
 yum remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine
 yum install https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-1.2.6-3.3.el7.x86_64.rpm -y
 yum -y install docker-ce docker-ce-cli
+mkdir -p /etc/docker/
+cat >> /etc/docker/daemon.json <<EOL
+{
+  "storage-driver": "overlay2"
+}
+EOL
 systemctl start docker && systemctl enable docker
 usermod -a -G docker ec2-user
 newgrp docker
@@ -52,6 +60,11 @@ echo 'eval "$(chef shell-init bash)"' >> /etc/profile
 echo 'export PATH="/opt/chefdk/embedded/bin:$PATH"' >> /etc/profile
 source /etc/profile
 
+echo 'eval "$(chef shell-init bash)"' >> ~/.bash_profile
+
+echo 'export PATH="/opt/chefdk/embedded/bin:$PATH"' >> ~/.bash_profile
+source ~/.bash_profile
+
 #Install Go
 yum module -y install go-toolset
 
@@ -69,6 +82,14 @@ echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nf
 
 source /etc/profile
 
+echo 'export PYENV_ROOT="/usr/src/.pyenv"' >> ~/.bash_profile
+
+echo 'export PATH="/usr/src/.pyenv/bin:$PATH"' >> ~/.bash_profile
+
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n  eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+
+source ~/.bash_profile
+
 #Install latest python3
 /usr/src/.pyenv/bin/pyenv install 3.8.3
 
@@ -84,7 +105,7 @@ pip install --upgrade pip
 
 pip install wheel
 
-pip install ansible boto boto3 tox pypsrp pywinrm requests-credssp requests-ntlm awscli
+pip install ansible boto boto3 tox pypsrp pywinrm requests-credssp requests-ntlm awscli aws-cfn-bootstrap
 
 #Install latest version of Packer
 rm -f /usr/sbin/packer
@@ -101,6 +122,9 @@ curl -fsSL "$PACKER_URL" -o /packer.zip \
 echo 'export PATH=/usr/local/bin/:$PATH' >> /etc/profile
 source /etc/profile
 
+echo 'export PATH=/usr/local/bin/:$PATH' >> ~/.bash_profile
+source ~/.bash_profile
+
 #Install latest version of Terraform
 cd /usr/src
 curl -O https://releases.hashicorp.com/terraform/0.12.25/terraform_0.12.25_linux_amd64.zip
@@ -114,6 +138,9 @@ cd /usr/src && tar -xJf node-v12.16.3-linux-x64.tar.xz -C /usr/src/local/lib/nod
 chmod +x /usr/src/local/lib/nodejs/bin/node
 echo 'export PATH=/usr/src/local/lib/nodejs/bin/:$PATH' >> /etc/profile
 source /etc/profile
+
+echo 'export PATH=/usr/src/local/lib/nodejs/bin/:$PATH' >> ~/.bash_profile
+source ~/.bash_profile
 
 
 echo "$(tput setaf 7)###############Installed Development Tools Details:################# $(tput sgr 0)"
