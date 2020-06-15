@@ -1,0 +1,347 @@
+AWSTemplateFormatVersion : '2010-09-09'
+
+Description: Create Ec2 Instance by fetching latest RHEL 8 AMI & associate a IAM role to EC2 instance
+
+Parameters:
+
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+    Default: test1
+
+  Region:
+    Description: EC2 instance AMI Region
+    Type: String
+    Default: us-east-1
+
+  VpcId:
+    Type: String
+    Description: VPC ID used for EC2 instance, which shuold already exist
+    Default: vpc-id
+
+  InstanceSubID:
+    Type: AWS::EC2::Subnet::Id
+    Description: Subnet ID used for EC2 instance, which shuold already exist
+    Default: subnet-id
+
+  OSName:
+    Description: EC2 instance AMI OS Name
+    Type: String
+    Default: RHEL-8.*
+
+  AMIDescription:
+    Description: EC2 instance AMI Description
+    Type: String
+    Default: Provided by Red Hat, Inc*
+
+  Architecture:
+    Description: EC2 instance AMI Architecture
+    Type: String
+    Default: x86_64
+
+  Owner:
+    Description: EC2 instance AMI Owner
+    Type: String
+    Default: "309956199498"
+
+  State:
+    Description: EC2 instance AMI State
+    Type: String
+    Default: available
+
+  RootDevType:
+    Description: EC2 instance AMI Root Device Type
+    Type: String
+    Default: ebs
+
+  VirtualType:
+    Description: EC2 instance AMI Virtualization Type
+    Type: String
+    Default: hvm
+
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t3.medium
+    AllowedValues: [t3.nano, t3.micro, t3.small, t3.medium, t3.large, t3.xlarge, t3.2xlarge]
+    ConstraintDescription: must be a valid EC2 instance type.
+
+  Environment:
+    Type: String
+    Default: Development
+
+  InstanceProfileName:
+    Type: String
+    Description: IAM Instance Profile Name used for EC2 instance
+    Default: new-test-ins-profile
+
+Resources:
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: bastion-vinay-latest
+      GroupDescription: To allow SSH Access
+      VpcId:
+        Ref: VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: "172.31.80.0/20"
+
+  Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: new-test-policy
+      PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+            -
+              Sid: AllowServices
+              Effect: Allow
+              Action:
+                - ec2:AuthorizeSecurityGroupIngress
+                - ec2:DescribeInstances
+                - ec2:CreateKeyPair
+                - ec2:CreateImage
+                - ec2:CopyImage
+                - ec2:DescribeSnapshots
+                - ec2:AssociateVpcCidrBlock
+                - ec2:ReplaceIamInstanceProfileAssociation
+                - ec2:UpdateSecurityGroupRuleDescriptionsIngress
+                - ec2:DeleteVolume
+                - ec2:ModifySnapshotAttribute
+                - ec2:CreateNetworkInterfacePermission
+                - ec2:DescribeVolumes
+                - ec2:UnassignPrivateIpAddresses
+                - ec2:ImportImage
+                - ec2:DetachVolume
+                - ec2:UpdateSecurityGroupRuleDescriptionsEgress
+                - ec2:ImportKeyPair
+                - ec2:CreateTags
+                - ec2:RegisterImage
+                - ec2:DeleteNetworkInterface
+                - ec2:RunInstances
+                - ec2:StopInstances
+                - ec2:AssignPrivateIpAddresses
+                - ec2:CreateVolume
+                - ec2:DescribeImportSnapshotTasks
+                - ec2:CreateNetworkInterface
+                - ec2:GetPasswordData
+                - ec2:DescribeImageAttribute
+                - ec2:AssociateSubnetCidrBlock
+                - ec2:AssociateAddress
+                - ec2:CreateSubnet
+                - ec2:DescribeSubnets
+                - ec2:DeleteKeyPair
+                - ec2:AttachVolume
+                - ec2:DeregisterImage
+                - ec2:ImportVolume
+                - ec2:DeleteSnapshot
+                - ec2:DeleteTags
+                - ec2:RunScheduledInstances
+                - ec2:DescribeRegions
+                - ec2:DescribeDhcpOptions
+                - ec2:ModifyImageAttribute
+                - ec2:CreateDefaultSubnet
+                - ec2:DescribeNetworkInterfaces
+                - ec2:CreateSecurityGroup
+                - ec2:CreateSnapshot
+                - ec2:ModifyInstanceAttribute
+                - ec2:DescribeInstanceStatus
+                - ec2:TerminateInstances
+                - ec2:ImportInstance
+                - ec2:DescribeTags
+                - ec2:ImportSnapshot
+                - ec2:DescribeImportImageTasks
+                - ec2:DisassociateSubnetCidrBlock
+                - ec2:DescribeSecurityGroups
+                - ec2:DescribeImages
+                - ec2:DescribeSecurityGroupReferences
+                - ec2:DescribeVpcs
+                - ec2:DescribePublicIpv4Pools
+                - ec2:ApplySecurityGroupsToClientVpnTargetNetwork
+              Resource: "*"
+            -
+              Effect: Allow
+              Action:
+                - s3:GetObjectVersion
+                - s3:GetBucketVersioning
+                - s3:PutObject
+                - s3:GetObject
+              Resource: "*"
+
+  Role:
+    Type: AWS::IAM::Role
+    DependsOn: Policy
+    Properties:
+      RoleName: new-test-role
+      AssumeRolePolicyDocument:
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+      - Ref: 'Policy'
+      Policies:
+        -
+          PolicyName: local-policy
+          PolicyDocument:
+            Statement:
+              -
+                Effect: Allow
+                Action: iam:PassRole
+                Resource: "*"
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: new-test-ins-profile
+      Roles:
+      - Ref: 'Role'
+
+  LambdaDescribeImagesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: new-lambda-test-role
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+      Policies:
+        - PolicyName: LambdaDescribeImages
+          PolicyDocument:
+            Statement:
+              - Action: ec2:DescribeImages
+                Effect: Allow
+                Resource: "*"
+
+  GetLatestAMI:
+    DependsOn:
+      - LambdaDescribeImagesRole
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.7
+      Handler: index.handler
+      Role:
+        Fn::GetAtt: [LambdaDescribeImagesRole, Arn]
+      Timeout: 60
+      Code:
+        ZipFile: |
+          import boto3
+          import sys
+          import cfnresponse
+          import json
+          from dateutil import parser
+
+
+          region = "us-east-1"
+
+          def handler(event, context):
+              try:
+                  def newest_image(list_of_images):
+                      latest = None
+
+                      for image in list_of_images:
+                          if not latest:
+                              latest = image
+                              continue
+
+                          if parser.parse(image['CreationDate']) > parser.parse(latest['CreationDate']):
+                              latest = image
+
+                      return latest
+
+                  client = boto3.client('ec2', region_name=region)
+
+                  filters = [ {
+                          'Name': 'name',
+                          'Values': ['RHEL-8.*']
+                      },{
+                          'Name': 'description',
+                          'Values': ['Provided by Red Hat, Inc*']
+                      },{
+                          'Name': 'architecture',
+                          'Values': ['x86_64']
+                      },{
+                          'Name': 'owner-id',
+                          'Values': ['309956199498']
+                      },{
+                          'Name': 'state',
+                          'Values': ['available']
+                      },{
+                          'Name': 'root-device-type',
+                          'Values': ['ebs']
+                      },{
+                          'Name': 'virtualization-type',
+                          'Values': ['hvm']
+                      } ]
+
+                  response = client.describe_images(Owners=['309956199498'], Filters=filters)
+
+                  source_image = newest_image(response['Images'])
+                  Id = (source_image['ImageId'])
+
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {}, Id)
+              except:
+                  traceback.print_last()
+                  cfnresponse.send(event, context, cfnresponse.FAIL, {}, "ok")
+
+
+  RHEL8AMI:
+    Type: Custom::FindLatestAMI
+    Properties:
+      ServiceToken:
+        Fn::GetAtt: [GetLatestAMI, Arn]
+
+  EC2Instance:
+    DependsOn:
+      - InstanceProfile
+      - GetLatestAMI
+      - SecurityGroup
+      - RHEL8AMI
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType:
+        Ref: 'InstanceType'
+      KeyName:
+        Ref: 'KeyName'
+      ImageId:
+        Ref: 'RHEL8AMI'
+      SubnetId:
+        Ref: 'InstanceSubID'
+      IamInstanceProfile:
+        Ref: 'InstanceProfileName'
+      SecurityGroupIds:
+        - Ref: 'SecurityGroup'
+      Monitoring: false
+      Tags:
+        -
+          Key: Name
+          Value: test_ins
+Outputs:
+  InstanceId:
+    Description: InstanceId of the newly created EC2 instance
+    Value:
+      Ref: 'EC2Instance'
+  AZ:
+    Description: Availability Zone of the newly created EC2 instance
+    Value:
+      Fn::GetAtt: [EC2Instance, AvailabilityZone]
+  PublicDNS:
+    Description: Public DNSName of the newly created EC2 instance
+    Value:
+      Fn::GetAtt: [EC2Instance, PublicDnsName]
+  PublicIP:
+    Description: Public IP address of the newly created EC2 instance
+    Value:
+      Fn::GetAtt: [EC2Instance, PublicIp]
