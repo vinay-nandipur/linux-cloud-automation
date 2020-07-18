@@ -13,12 +13,16 @@ printf "Enter offline bundle location:\t"
 
 read offline_bundle_path
 
-ssh -l root $esxi_fqdn_or_ip "vim-cmd /hostsvc/maintenance_mode_enter"
+printf "Enter private key location:\t"
 
-ssh -l root $esxi_fqdn_or_ip "esxcli software vib update -d $offline_bundle_path"
+read private_key_file
 
-ssh -l root $esxi_fqdn_or_ip "esxcli system shutdown reboot --reason=esxi_upgraded"
+ssh -i $private_key_file -l root $esxi_fqdn_or_ip "vim-cmd /hostsvc/maintenance_mode_enter"
+
+ssh -i $private_key_file -l root $esxi_fqdn_or_ip "esxcli software vib update -d $offline_bundle_path"
+
+ssh -i $private_key_file -l root $esxi_fqdn_or_ip "esxcli system shutdown reboot --reason=esxi_upgraded"
 
 sleep 1000
 
-ssh -l root $esxi_fqdn_or_ip "vim-cmd /hostsvc/maintenance_mode_exit"
+ssh -i $private_key_file -l root $esxi_fqdn_or_ip "vim-cmd /hostsvc/maintenance_mode_exit"
