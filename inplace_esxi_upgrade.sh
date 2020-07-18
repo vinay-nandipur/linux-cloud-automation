@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 #note: key based ssh authentication should be enabled to avoid entering password repeatedly.
+#https://kb.vmware.com/s/article/1002866
 
 #In below example, upgrading ESXI from 6.0 to 6.5.
 
